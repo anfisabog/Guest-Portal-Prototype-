@@ -189,7 +189,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
 
       <div
         className={`flex-1 overflow-y-auto scrollable`}
-        style={{ paddingBottom: cartItems.length > 0 ? 80 : (tabBarVariant === 'v2' ? 104 : 68), backgroundImage: "url('/home page background.png')", backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}
+        style={{ paddingBottom: tabBarVariant === 'v2' ? 104 : 68, backgroundImage: "url('/home page background.png')", backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}
       >
 
         {/* ── Hero Header ── */}
