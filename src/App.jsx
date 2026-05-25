@@ -55,6 +55,8 @@ export default function App() {
   }
 
   const handleBuyNow = (item) => {
+    // FREE items auto-confirmed in drawer — drawer calls onBuy to close, no checkout needed
+    if (item.price === 'FREE') return
     setCartItems([{ ...item }])
     setUpsellCheckoutContext('upsell')
     navigate(SCREENS.UPSELL_CHECKOUT)

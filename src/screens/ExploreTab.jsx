@@ -6,7 +6,7 @@ export default function ExploreTab() {
       {/* Header */}
       <div
         className="shrink-0 px-4 pt-4 pb-6 relative overflow-hidden"
-        style={{ backgroundImage: 'url(/bg-header.png)', backgroundSize: 'cover', backgroundPosition: 'center top' }}
+        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}bg-header.png)`, backgroundSize: 'cover', backgroundPosition: 'center top' }}
       >
         <p className="text-[15px] font-normal text-(--color-fg-secondary)">Brisa Deluxe Studio</p>
         <h1 className="text-[24px] font-semibold text-(--color-fg-primary) leading-8 mt-0.5">Explore</h1>

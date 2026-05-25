@@ -189,7 +189,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
 
       <div
         className={`flex-1 overflow-y-auto scrollable`}
-        style={{ paddingBottom: tabBarVariant === 'v2' ? 104 : 68, backgroundImage: "url('/home page background.png')", backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}
+        style={{ paddingBottom: tabBarVariant === 'v2' ? 104 : 68, backgroundImage: `url(${import.meta.env.BASE_URL}home page background.png)`, backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}
       >
 
         {/* ── Hero Header ── */}
@@ -197,7 +197,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full overflow-hidden shrink-0">
-                <img src="/property-logo.png" alt="Property logo" className="w-full h-full object-cover" />
+                <img src={`${import.meta.env.BASE_URL}property-logo.png`} alt="Property logo" className="w-full h-full object-cover" />
               </div>
               <span className="text-[16px] font-semibold text-(--color-fg-primary) leading-tight">Welcome, Maria</span>
             </div>
@@ -232,7 +232,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
                 </button>
               </div>
               <div className="w-[100px] h-[100px] rounded-xl shrink-0 overflow-hidden">
-                <img src="/brisa-studio.png" alt="Brisa Deluxe Studio" className="w-full h-full object-cover" />
+                <img src={`${import.meta.env.BASE_URL}brisa-studio.png`} alt="Brisa Deluxe Studio" className="w-full h-full object-cover" />
               </div>
             </div>
 

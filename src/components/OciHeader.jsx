@@ -7,7 +7,7 @@ export default function OciHeader({ title, subtitle = 'Brisa Deluxe Studio', pro
   }
 
   return (
-    <div className="shrink-0 h-[180px] relative overflow-hidden" style={{ backgroundImage: 'url(/bg-header.png)', backgroundSize: 'cover', backgroundPosition: 'center top' }}>
+    <div className="shrink-0 h-[180px] relative overflow-hidden" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}bg-header.png)`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
       <div className="relative z-10 px-4 pt-4">
         {/* Nav row */}
         <div className="flex items-center justify-between">

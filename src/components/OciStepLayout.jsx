@@ -55,7 +55,7 @@ export default function OciStepLayout({
       <div
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: 'url(/bg-full.png)',
+          backgroundImage: `url(${import.meta.env.BASE_URL}bg-full.png)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center top',
         }}

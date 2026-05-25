@@ -7,10 +7,10 @@ import InfoBanner from '../components/InfoBanner'
 import { InputField } from '@hostaway/design-system'
 import { handleDateChange, validateDate } from '../utils/dateUtils'
 
-const TRAVEL_OPTIONS = [
-  { value: 'Leisure',  label: 'Leisure',  icon: '/icon-umbrella.svg' },
-  { value: 'Business', label: 'Business', icon: '/icon-briefcase.svg' },
-  { value: 'Both',     label: 'Both',     icon: '/icon-luggage.svg' },
+const TRAVEL_OPTIONS = () => [
+  { value: 'Leisure',  label: 'Leisure',  icon: `${import.meta.env.BASE_URL}icon-umbrella.svg` },
+  { value: 'Business', label: 'Business', icon: `${import.meta.env.BASE_URL}icon-briefcase.svg` },
+  { value: 'Both',     label: 'Both',     icon: `${import.meta.env.BASE_URL}icon-luggage.svg` },
 ]
 
 // Sorted longest-prefix-first for correct matching (e.g. +351 before +35)
@@ -277,7 +277,7 @@ export default function Step1({ navigate, onExit, onFormDirty, onAddToCart, onRe
         <div>
           <p className="text-[14px] font-medium text-(--color-fg-secondary) mb-3">Travel purpose</p>
           <CardSelector
-            options={TRAVEL_OPTIONS}
+            options={TRAVEL_OPTIONS()}
             value={purpose}
             onChange={(v) => { setPurpose(v); onFormDirty?.() }}
           />

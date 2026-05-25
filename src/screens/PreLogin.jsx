@@ -3,7 +3,7 @@ import MenuButton from '../components/MenuButton'
 
 export default function PreLogin({ navigate }) {
   return (
-    <div className="h-screen flex flex-col relative overflow-hidden" style={{ backgroundImage: 'url(/bg-full.png)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <div className="h-screen flex flex-col relative overflow-hidden" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}bg-full.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
 
       <div className="relative z-10 flex flex-col flex-1">
 
@@ -28,7 +28,7 @@ export default function PreLogin({ navigate }) {
             <div className="px-5 pt-8 pb-6">
               {/* Illustration */}
               <div className="flex justify-center mb-5">
-                <img src="/empty-state.svg" alt="" className="w-[160px]" />
+                <img src={`${import.meta.env.BASE_URL}empty-state.svg`} alt="" className="w-[160px]" />
               </div>
 
               <h2 className="text-[22px] font-bold text-(--color-fg-primary) text-center mb-2 leading-[30px]">

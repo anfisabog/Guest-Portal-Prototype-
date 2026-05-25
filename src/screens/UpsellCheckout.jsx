@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { SCREENS } from '../screens'
 
 // Upsell cart review + pay page.
@@ -14,10 +15,25 @@ function getCurrency(cartItems) {
   return item ? item.price.replace(/[0-9., ]/g, '') || '€' : '€'
 }
 
+const PAYMENT_METHODS = [
+  { id: 'apple-pay',   label: 'Apple Pay',          icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> },
+  { id: 'google-pay',  label: 'Google Pay',         icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 11.5v1.5h3.5c-.15.9-1.1 2.65-3.5 2.65C9.65 15.65 7.8 13.75 7.8 11.5S9.65 7.35 12 7.35c1.3 0 2.15.55 2.65 1.05l1.8-1.75C15.3 5.45 13.8 4.75 12 4.75 8.1 4.75 5 7.85 5 11.75S8.1 18.75 12 18.75c4.1 0 6.8-2.9 6.8-6.95 0-.45-.05-.8-.1-1.15L12 10.6v.9z" fill="#4285F4"/></svg> },
+  { id: 'card',        label: 'Credit / Debit card', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/><path d="M2 9h20" stroke="currentColor" strokeWidth="1.6"/><path d="M6 15h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg> },
+]
+
 export default function UpsellCheckout({ context = 'upsell', cartItems = [], onRemoveFromCart, navigate, onExit, onConfirm }) {
+  const [selectedMethod, setSelectedMethod] = useState('card')
+  const [cardNumber, setCardNumber] = useState('')
+  const [cardName, setCardName]     = useState('')
+  const [expiry, setExpiry]         = useState('')
+  const [cvc, setCvc]               = useState('')
+
   const total = cartItems.reduce((sum, item) => sum + parsePrice(item.price), 0)
   const currency = getCurrency(cartItems)
   const isRequestFlow = cartItems.some(i => i.requiresRequest)
+
+  const formatCard   = v => v.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim()
+  const formatExpiry = v => { const d=v.replace(/\D/g,'').slice(0,4); return d.length>=3?`${d.slice(0,2)}/${d.slice(2)}`:d }
 
   const handleConfirm = () => {
     if (onConfirm) {
@@ -118,6 +134,47 @@ export default function UpsellCheckout({ context = 'upsell', cartItems = [], onR
           )}
         </div>
 
+        {/* ── Payment method selection (paid non-request items only) ── */}
+        {cartItems.length > 0 && !isRequestFlow && total > 0 && (
+          <div className="mx-5 mb-4">
+            <p className="text-[16px] font-semibold text-(--color-fg-primary) mb-3">Payment method</p>
+            <div className="flex flex-col gap-2">
+              {PAYMENT_METHODS.map(({ id, label, icon }) => {
+                const active = selectedMethod === id
+                return (
+                  <button key={id} onClick={() => setSelectedMethod(id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-colors text-left ${active ? 'border-(--color-hostaway-secondary-600) bg-(--color-bg-secondary)' : 'border-(--color-border-primary) bg-white hover:bg-(--color-bg-secondary)'}`}
+                  >
+                    <span className={active ? 'text-(--color-hostaway-secondary-600)' : 'text-(--color-fg-tertiary)'}>{icon}</span>
+                    <span className={`flex-1 text-[16px] font-medium ${active ? 'text-(--color-fg-primary)' : 'text-(--color-fg-secondary)'}`}>{label}</span>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${active ? 'border-(--color-hostaway-secondary-600)' : 'border-(--color-border-primary)'}`}>
+                      {active && <div className="w-2.5 h-2.5 rounded-full bg-(--color-hostaway-secondary-600)" />}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Card details */}
+            {selectedMethod === 'card' && (
+              <div className="mt-3 flex flex-col gap-2">
+                <div className="h-12 border border-(--color-border-primary) rounded-xl flex items-center bg-white overflow-hidden">
+                  <input type="text" inputMode="numeric" placeholder="0000 0000 0000 0000" value={cardNumber} onChange={e => setCardNumber(formatCard(e.target.value))}
+                    className="flex-1 px-4 text-[16px] text-(--color-fg-primary) placeholder:text-(--color-fg-quaternary) bg-transparent tracking-wide" />
+                </div>
+                <input type="text" placeholder="Cardholder name" value={cardName} onChange={e => setCardName(e.target.value)}
+                  className="w-full h-12 border border-(--color-border-primary) rounded-xl px-4 text-[16px] text-(--color-fg-primary) placeholder:text-(--color-fg-quaternary) bg-white" />
+                <div className="flex gap-2">
+                  <input type="text" inputMode="numeric" placeholder="MM / YY" value={expiry} onChange={e => setExpiry(formatExpiry(e.target.value))}
+                    className="flex-1 h-12 border border-(--color-border-primary) rounded-xl px-4 text-[16px] text-(--color-fg-primary) placeholder:text-(--color-fg-quaternary) bg-white" />
+                  <input type="text" inputMode="numeric" placeholder="CVC" value={cvc} onChange={e => setCvc(e.target.value.replace(/\D/g,'').slice(0,4))}
+                    className="w-[100px] h-12 border border-(--color-border-primary) rounded-xl px-4 text-[16px] text-(--color-fg-primary) placeholder:text-(--color-fg-quaternary) bg-white tracking-widest" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Request-flow info banner */}
         {cartItems.length > 0 && isRequestFlow && (
           <div className="mx-5 mb-4 px-4 py-3.5 bg-white rounded-2xl border border-(--color-border-secondary) flex gap-3">
@@ -177,7 +234,11 @@ export default function UpsellCheckout({ context = 'upsell', cartItems = [], onR
             ? 'Nothing to pay'
             : isRequestFlow
               ? 'Send a request'
-              : `Confirm & pay ${currency}${total.toFixed(2)}`}
+              : selectedMethod === 'apple-pay'
+                ? `Pay with Apple Pay — ${currency}${total.toFixed(2)}`
+                : selectedMethod === 'google-pay'
+                  ? `Pay with Google Pay — ${currency}${total.toFixed(2)}`
+                  : `Pay ${currency}${total.toFixed(2)}`}
         </button>
         {isRequestFlow && cartItems.length > 0 && (
           <p className="text-[12px] text-(--color-fg-tertiary) text-center mt-2">No payment will be charged yet</p>
