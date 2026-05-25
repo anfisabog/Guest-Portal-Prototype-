@@ -305,7 +305,7 @@ export default function AccessReveal({ navigate, checkInComplete, checkInStarted
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}home page background.png)`, backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}>
+    <div className="min-h-screen flex flex-col relative" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}home%20page%20background.png)`, backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}>
       {showConfetti && <ConfettiOverlay />}
 
       <div className="flex-1 overflow-y-auto scrollable pb-[104px]">

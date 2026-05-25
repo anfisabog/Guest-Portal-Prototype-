@@ -108,6 +108,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
   const [mapDragY, setMapDragY] = useState(0)
   const [mapSnapping, setMapSnapping] = useState(false)
   const [upsellDrawerItem, setUpsellDrawerItem] = useState(null)
+  const [addedUpsells, setAddedUpsells] = useState(new Set())
   const mapDragStart = useRef(null)
 
   const handleMapDragStart = (clientY) => { setMapSnapping(false); mapDragStart.current = clientY }
@@ -189,7 +190,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
 
       <div
         className={`flex-1 overflow-y-auto scrollable`}
-        style={{ paddingBottom: tabBarVariant === 'v2' ? 104 : 68, backgroundImage: `url(${import.meta.env.BASE_URL}home page background.png)`, backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}
+        style={{ paddingBottom: tabBarVariant === 'v2' ? 104 : 68, backgroundImage: `url(${import.meta.env.BASE_URL}home%20page%20background.png)`, backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}
       >
 
         {/* ── Hero Header ── */}
@@ -286,9 +287,15 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
             <p className="text-[16px] font-bold text-(--color-fg-primary) mb-2 px-4">Enhance your stay</p>
             <div className="flex gap-3 overflow-x-auto pl-4 pr-4 scrollable">
               {upsellItems.map((item) => {
-                const { id, label, description, price, unit, image } = item
+                const { id, label, description, price, unit, image, addedByOTA } = item
+                const isAdded = addedUpsells.has(id)
+                const clickable = !addedByOTA
                 return (
-                  <div key={id} className="bg-white rounded-2xl flex-shrink-0 w-[220px] flex flex-col overflow-hidden">
+                  <div
+                    key={id}
+                    onClick={clickable ? () => setUpsellDrawerItem(item) : undefined}
+                    className={`bg-white rounded-2xl flex-shrink-0 w-[220px] flex flex-col overflow-hidden ${clickable ? 'cursor-pointer active:opacity-80' : ''}`}
+                  >
                     {/* Image */}
                     <div className="w-full h-[110px] bg-(--color-bg-warm) overflow-hidden">
                       {image
@@ -297,25 +304,37 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
                       }
                     </div>
                     {/* Content */}
-                    <div className="p-3 flex flex-col gap-2 flex-1">
-                      <p className="text-[14px] font-bold text-(--color-fg-primary) leading-5">{label}</p>
-                      <p className="text-[12px] text-(--color-fg-tertiary) leading-4 line-clamp-2">{description}</p>
-                      <div className="flex items-baseline gap-0.5 mt-auto">
-                        {price === 'FREE' ? (
-                          <span className="text-[14px] font-bold text-(--color-fg-primary)">FREE</span>
+                    <div className="p-3 flex flex-col flex-1">
+                      <p className="text-[14px] font-bold text-(--color-fg-primary) leading-5 mb-1">{label}</p>
+                      <p className="text-[12px] text-(--color-fg-tertiary) leading-4 line-clamp-2 flex-1">{description}</p>
+                      {/* Price row + indicator */}
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-baseline gap-0.5">
+                          {price === 'FREE' ? (
+                            <span className="text-[14px] font-bold text-(--color-hostaway-secondary-600)">FREE</span>
+                          ) : (
+                            <>
+                              <span className="text-[14px] font-bold text-(--color-fg-primary)">{price}</span>
+                              {unit && <span className="text-[11px] text-(--color-fg-tertiary) ml-0.5">{unit}</span>}
+                            </>
+                          )}
+                        </div>
+                        {addedByOTA ? (
+                          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-(--color-bg-secondary) text-(--color-fg-quaternary) border border-(--color-border-secondary)">
+                            Included
+                          </span>
+                        ) : isAdded ? (
+                          <span className="w-5 h-5 rounded-full bg-(--color-hostaway-secondary-600) flex items-center justify-center shrink-0">
+                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                              <path d="M2 5l2.5 2.5L8 3" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </span>
                         ) : (
-                          <>
-                            <span className="text-[14px] font-bold text-(--color-fg-primary)">{price}</span>
-                            {unit && <span className="text-[12px] text-(--color-fg-tertiary) ml-0.5">{unit}</span>}
-                          </>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 4l4 4-4 4" stroke="var(--color-fg-quaternary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
                         )}
                       </div>
-                      <button
-                        onClick={() => setUpsellDrawerItem(item)}
-                        className="w-full h-9 border border-(--color-border-primary) rounded-xl text-[13px] font-semibold text-(--color-fg-primary) mt-1 hover:bg-(--color-bg-secondary) active:bg-(--color-bg-tertiary) transition-colors cursor-pointer"
-                      >
-                        Read more
-                      </button>
                     </div>
                   </div>
                 )
@@ -453,7 +472,11 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
           onClose={() => setUpsellDrawerItem(null)}
           onBuy={(item) => {
             setUpsellDrawerItem(null)
-            onBuyNow?.(item)
+            if (item.price === 'FREE') {
+              setAddedUpsells(prev => new Set([...prev, item.id]))
+            } else {
+              onBuyNow?.(item)
+            }
           }}
         />
       )}
