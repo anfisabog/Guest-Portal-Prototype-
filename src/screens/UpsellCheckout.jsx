@@ -55,6 +55,14 @@ export default function UpsellCheckout({ context = 'upsell', cartItems = [], onR
   const isRequestFlow = cartItems.some(i => i.requiresRequest)
   const itemLabel = cartItems[0]?.label ?? 'your extra'
 
+  // Auto-close when cart emptied by removing last item
+  useEffect(() => {
+    if (!paid && cartItems.length === 0) {
+      if (context === 'checkin') onExit?.()
+      else navigate(SCREENS.UPSELLS)
+    }
+  }, [cartItems.length]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const formatCard   = v => v.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim()
   const formatExpiry = v => { const d=v.replace(/\D/g,'').slice(0,4); return d.length>=3?`${d.slice(0,2)}/${d.slice(2)}`:d }
 
@@ -78,24 +86,32 @@ export default function UpsellCheckout({ context = 'upsell', cartItems = [], onR
   // ── Success screen ────────────────────────────────────────────────────────
   if (paid) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-(--color-bg-warm) relative px-6">
+      <div
+        className="min-h-screen flex flex-col relative overflow-hidden"
+        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}pack-your-bags.png)`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
         <ConfettiOverlay />
-        <div className="w-20 h-20 rounded-full bg-(--color-hostaway-secondary-600) flex items-center justify-center mb-6 shadow-lg">
-          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-            <path d="M7 18l7 7 15-15" stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        {/* Centered content */}
+        <div className="flex-1 flex flex-col items-center justify-center px-8">
+          <div className="w-20 h-20 rounded-full bg-(--color-hostaway-secondary-600) flex items-center justify-center mb-6 shadow-lg">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <path d="M7 18l7 7 15-15" stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h1 className="text-[32px] font-bold text-(--color-fg-primary) text-center leading-[40px] mb-3">You're all set! 🎉</h1>
+          <p className="text-[16px] text-(--color-fg-tertiary) text-center leading-6">
+            <span className="font-semibold text-(--color-fg-primary)">{itemLabel}</span> has been added to your reservation.
+          </p>
         </div>
-        <h1 className="text-[28px] font-bold text-(--color-fg-primary) text-center mb-2 leading-tight">You're all set! 🎉</h1>
-        <p className="text-[16px] text-(--color-fg-tertiary) text-center leading-relaxed mb-2">
-          <span className="font-semibold text-(--color-fg-primary)">{itemLabel}</span> has been added to your reservation.
-        </p>
-        <p className="text-[14px] text-(--color-fg-quaternary) text-center mb-10">Payment confirmed. Enjoy!</p>
-        <button
-          onClick={handleDone}
-          className="w-full max-w-[320px] h-12 bg-(--color-fg-primary) rounded-xl text-[16px] font-semibold text-white active:opacity-90 transition-opacity"
-        >
-          Back to extras
-        </button>
+        {/* Footer — pinned to bottom like Step6 */}
+        <div className="shrink-0 px-4 pb-8">
+          <button
+            onClick={handleDone}
+            className="w-full h-14 bg-(--color-fg-primary) rounded-2xl flex items-center justify-center active:opacity-90 transition-opacity"
+          >
+            <span className="text-[16px] font-semibold text-white">Go back home</span>
+          </button>
+        </div>
       </div>
     )
   }
