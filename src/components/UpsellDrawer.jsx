@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react'
 
 // ── Upsell detail drawer — full-screen bottom sheet ───────────────────────────
+// Layout: drag handle → title → image (margins + rounded) → description → price
 // FREE items: confirm instantly, show success state, close automatically.
-// Paid items: "Buy now — €X" / "Request — €X" → navigate to checkout.
+// Paid items: "Buy now — €20.00" / "Request — €20.00" → navigate to checkout.
+
+function formatPriceCta(price) {
+  if (!price || price === 'FREE') return 'FREE'
+  const num = parseFloat(price.replace(/[^0-9.]/g, ''))
+  const sym = price.replace(/[0-9., ]/g, '') || '€'
+  return `${sym}${isNaN(num) ? price : num.toFixed(2)}`
+}
 
 export default function UpsellDrawer({ item, onClose, onBuy }) {
   const [confirmed, setConfirmed] = useState(false)
@@ -22,13 +30,13 @@ export default function UpsellDrawer({ item, onClose, onBuy }) {
   if (!item) return null
   const { label, tagline, description, extendedDescription, price, unit, requiresRequest, addedByOTA, image } = item
   const isFree = price === 'FREE'
+  const formattedPrice = formatPriceCta(price)
 
-  const priceLabel = isFree ? 'FREE' : `${price}${unit ? ' ' + unit : ''}`
   const ctaLabel = isFree
     ? 'Add for free'
     : requiresRequest
-      ? `Request — ${price}${unit ? ' ' + unit : ''}`
-      : `Buy now — ${price}${unit ? ' ' + unit : ''}`
+      ? `Request — ${formattedPrice}`
+      : `Buy now — ${formattedPrice}`
 
   const handleCta = () => {
     if (isFree) setConfirmed(true)
@@ -40,7 +48,7 @@ export default function UpsellDrawer({ item, onClose, onBuy }) {
       className="fixed inset-0 z-[300] flex flex-col"
       style={{ maxWidth: 900, left: '50%', transform: 'translateX(-50%)', width: '100%' }}
     >
-      {/* Backdrop (slim strip at top since sheet is nearly full screen) */}
+      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       {/* Sheet — full height */}
@@ -49,7 +57,7 @@ export default function UpsellDrawer({ item, onClose, onBuy }) {
         style={{ height: '93vh' }}
       >
         {/* Drag handle */}
-        <div className="shrink-0 flex justify-center pt-3 pb-1">
+        <div className="shrink-0 flex justify-center pt-3 pb-2">
           <div className="w-10 h-1 rounded-full bg-(--color-border-primary)" />
         </div>
 
@@ -66,33 +74,34 @@ export default function UpsellDrawer({ item, onClose, onBuy }) {
         {/* ── Scrollable body ── */}
         <div className="overflow-y-auto scrollable flex-1 pb-[104px]">
 
-          {/* Hero image */}
-          <div className="w-full h-[220px] bg-(--color-bg-secondary) shrink-0">
-            {image
-              ? <img src={image} alt={label} className="w-full h-full object-cover" />
-              : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                    <rect x="3" y="7" width="34" height="26" rx="4" stroke="var(--color-fg-quaternary)" strokeWidth="1.6"/>
-                    <circle cx="13" cy="17" r="3.5" stroke="var(--color-fg-quaternary)" strokeWidth="1.6"/>
-                    <path d="M3 29l9-8 8 7 6-6 11 9" stroke="var(--color-fg-quaternary)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              )
-            }
+          {/* Title + tagline */}
+          <div className="px-5 pt-2 pb-4">
+            <h2 className="text-[26px] font-bold text-(--color-fg-primary) leading-tight">{label}</h2>
+            {tagline && (
+              <p className="text-[15px] text-(--color-fg-tertiary) mt-1">{tagline}</p>
+            )}
           </div>
 
-          {/* Content */}
-          <div className="px-5 pt-5">
-            {/* Title */}
-            <h2 className="text-[26px] font-bold text-(--color-fg-primary) leading-tight mb-1">{label}</h2>
+          {/* Hero image — with horizontal margins and rounded corners */}
+          <div className="px-5 mb-5">
+            <div className="w-full rounded-2xl overflow-hidden bg-(--color-bg-secondary)" style={{ height: 200 }}>
+              {image
+                ? <img src={image} alt={label} className="w-full h-full object-cover" />
+                : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                      <rect x="3" y="7" width="34" height="26" rx="4" stroke="var(--color-fg-quaternary)" strokeWidth="1.6"/>
+                      <circle cx="13" cy="17" r="3.5" stroke="var(--color-fg-quaternary)" strokeWidth="1.6"/>
+                      <path d="M3 29l9-8 8 7 6-6 11 9" stroke="var(--color-fg-quaternary)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                )
+              }
+            </div>
+          </div>
 
-            {/* Tagline */}
-            {tagline && (
-              <p className="text-[15px] text-(--color-fg-tertiary) mb-4">{tagline}</p>
-            )}
-
-            {/* Description paragraphs */}
+          {/* Description */}
+          <div className="px-5">
             <div className="flex flex-col gap-3 mb-5">
               {extendedDescription
                 ? extendedDescription.split('\n\n').map((para, i) => (
@@ -103,12 +112,12 @@ export default function UpsellDrawer({ item, onClose, onBuy }) {
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-1.5">
+            <div className="flex items-baseline gap-1.5 mb-2">
               {isFree ? (
                 <span className="text-[20px] font-bold text-(--color-hostaway-secondary-600)">FREE</span>
               ) : (
                 <>
-                  <span className="text-[20px] font-bold text-(--color-fg-primary)">{price}</span>
+                  <span className="text-[20px] font-bold text-(--color-fg-primary)">{formattedPrice}</span>
                   {unit && <span className="text-[14px] text-(--color-fg-tertiary)">{unit}</span>}
                 </>
               )}

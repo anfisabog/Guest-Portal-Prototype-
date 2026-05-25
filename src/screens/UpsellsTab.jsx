@@ -4,7 +4,22 @@ import UpsellDrawer from '../components/UpsellDrawer'
 
 export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
   const [drawerItem, setDrawerItem] = useState(null)
+  const [addedItems, setAddedItems] = useState(new Set())
   const pb = tabBarVariant === 'v2' ? 104 : 68
+
+  const handleDrawerBuy = (item) => {
+    setDrawerItem(null)
+    if (item.price === 'FREE') {
+      // FREE — track as added, no checkout needed
+      setAddedItems(prev => new Set([...prev, item.id]))
+    } else {
+      onBuyNow?.(item)
+    }
+  }
+
+  const handleRemove = (id) => {
+    setAddedItems(prev => { const s = new Set(prev); s.delete(id); return s })
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-(--color-bg-warm)">
@@ -20,6 +35,7 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
         <div className="px-4 flex flex-col gap-3 pb-4">
           {upsellItems.map((item) => {
             const { id, label, description, price, unit, image } = item
+            const isAdded = addedItems.has(id)
             return (
               <div key={id} className="bg-white rounded-2xl overflow-hidden flex">
                 {/* Image */}
@@ -44,7 +60,7 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
                   {/* Price */}
                   <div className="flex items-baseline gap-0.5 mt-2">
                     {price === 'FREE' ? (
-                      <span className="text-[16px] font-bold text-(--color-fg-primary)">FREE</span>
+                      <span className="text-[16px] font-bold text-(--color-hostaway-secondary-600)">FREE</span>
                     ) : (
                       <>
                         <span className="text-[16px] font-bold text-(--color-fg-primary)">{price}</span>
@@ -53,13 +69,22 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
                     )}
                   </div>
 
-                  {/* Read more */}
-                  <button
-                    onClick={() => setDrawerItem(item)}
-                    className="mt-2 w-full h-9 border border-(--color-border-primary) rounded-xl text-[14px] font-semibold text-(--color-fg-primary) hover:bg-(--color-bg-secondary) active:bg-(--color-bg-secondary) transition-colors"
-                  >
-                    Read more
-                  </button>
+                  {/* CTA — Read more or Remove */}
+                  {isAdded ? (
+                    <button
+                      onClick={() => handleRemove(id)}
+                      className="mt-2 w-full h-9 border border-(--color-border-secondary) rounded-xl text-[14px] font-semibold text-(--color-fg-tertiary) hover:bg-(--color-bg-secondary) active:bg-(--color-bg-secondary) transition-colors"
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setDrawerItem(item)}
+                      className="mt-2 w-full h-9 border border-(--color-border-primary) rounded-xl text-[14px] font-semibold text-(--color-fg-primary) hover:bg-(--color-bg-secondary) active:bg-(--color-bg-secondary) transition-colors"
+                    >
+                      Read more
+                    </button>
+                  )}
                 </div>
               </div>
             )
@@ -72,10 +97,7 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
         <UpsellDrawer
           item={drawerItem}
           onClose={() => setDrawerItem(null)}
-          onBuy={(item) => {
-            setDrawerItem(null)
-            onBuyNow?.(item)
-          }}
+          onBuy={handleDrawerBuy}
         />
       )}
     </div>

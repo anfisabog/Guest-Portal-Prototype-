@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { SCREENS } from '../screens'
 import OciStepLayout from '../components/OciStepLayout'
 import ArrivalTimeBottomSheet from '../components/ArrivalTimeBottomSheet'
@@ -6,6 +6,7 @@ import CardSelector from '../components/CardSelector'
 import InfoBanner from '../components/InfoBanner'
 import { InputField } from '@hostaway/design-system'
 import { handleDateChange, validateDate } from '../utils/dateUtils'
+import { upsellItems } from '../data/upsells'
 
 const TRAVEL_OPTIONS = () => [
   { value: 'Leisure',  label: 'Leisure',  icon: `${import.meta.env.BASE_URL}icon-umbrella.svg` },
@@ -100,6 +101,20 @@ export default function Step1({ navigate, onExit, onFormDirty, onAddToCart, onRe
   const [arrivalError, setArrivalError]     = useState(null)
   const [isEarlyArrival, setIsEarlyArrival] = useState(false)
   const [showArrivalSheet, setShowArrivalSheet] = useState(false)
+
+  // Amenity search
+  const [amenityQuery, setAmenityQuery] = useState('')
+  const [addedExtras, setAddedExtras]   = useState(new Set())
+
+  const amenityResults = useMemo(() => {
+    const q = amenityQuery.trim().toLowerCase()
+    if (!q) return []
+    return upsellItems.filter(item =>
+      item.label.toLowerCase().includes(q) ||
+      item.description.toLowerCase().includes(q) ||
+      (item.id && item.id.toLowerCase().includes(q))
+    )
+  }, [amenityQuery])
   const [carNumber, setCarNumber]           = useState('')
 
   const phoneFlag = detectFlag(phone) || phoneFlag2
@@ -286,6 +301,102 @@ export default function Step1({ navigate, onExit, onFormDirty, onAddToCart, onRe
         {/* Car registration — optional */}
         <InputField data-id="car-number" label="Car registration" placeholder="e.g. AB-12-CD"
           value={carNumber} onChange={setCarNumber} fieldSize="full" labelPosition="top" />
+
+        {/* ── Amenity / extras search ── */}
+        <div>
+          <p className="text-[14px] font-medium text-(--color-fg-secondary) mb-2">Need anything extra?</p>
+          <div className="relative">
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="7" cy="7" r="5" stroke="var(--color-fg-quaternary)" strokeWidth="1.4"/>
+              <path d="M11 11l3 3" stroke="var(--color-fg-quaternary)" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="e.g. baby cot, parking, early check-in"
+              value={amenityQuery}
+              onChange={e => setAmenityQuery(e.target.value)}
+              className="w-full h-11 border border-(--color-border-primary) rounded-xl pl-9 pr-9 text-[16px] text-(--color-fg-primary) placeholder:text-(--color-fg-quaternary) bg-white focus:outline-none focus:border-(--color-fg-primary)"
+            />
+            {amenityQuery && (
+              <button onClick={() => setAmenityQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 p-0.5">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M1 1l10 10M11 1L1 11" stroke="var(--color-fg-quaternary)" strokeWidth="1.6" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {amenityQuery.trim() && (
+            <div className="mt-3">
+              {amenityResults.length === 0 ? (
+                <div className="bg-white rounded-2xl px-4 py-3.5 border border-(--color-border-secondary)">
+                  <p className="text-[15px] font-semibold text-(--color-fg-primary) mb-0.5">Not a standard amenity</p>
+                  <p className="text-[14px] text-(--color-fg-tertiary)">Contact your host to check if this is available.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="mb-2.5">
+                    <p className="text-[14px] font-semibold text-(--color-fg-primary)">Not a standard amenity</p>
+                    <p className="text-[13px] text-(--color-fg-tertiary) mt-0.5">Not included, but you can add it to your stay.</p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {amenityResults.map(item => {
+                      const isAdded = addedExtras.has(item.id)
+                      return (
+                        <div key={item.id} className="bg-white rounded-2xl px-3.5 py-3 flex items-center gap-3 border border-(--color-border-secondary)">
+                          {/* Thumbnail */}
+                          <div className="w-10 h-10 rounded-xl shrink-0 overflow-hidden bg-(--color-bg-warm)">
+                            {item.image
+                              ? <img src={item.image} alt={item.label} className="w-full h-full object-cover" />
+                              : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                    <rect x="1" y="3" width="16" height="12" rx="2" stroke="var(--color-fg-quaternary)" strokeWidth="1.3"/>
+                                    <circle cx="6" cy="8" r="1.5" stroke="var(--color-fg-quaternary)" strokeWidth="1.3"/>
+                                    <path d="M1 13l4-3.5 3.5 3 3-3 5 4" stroke="var(--color-fg-quaternary)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                                  </svg>
+                                </div>
+                              )
+                            }
+                          </div>
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[15px] font-bold text-(--color-fg-primary) leading-tight">{item.label}</p>
+                            <p className={`text-[13px] font-semibold mt-0.5 ${item.price === 'FREE' ? 'text-(--color-hostaway-secondary-600)' : 'text-(--color-fg-secondary)'}`}>
+                              {item.price === 'FREE' ? 'FREE' : `${item.price}${item.unit ? ' ' + item.unit : ''}`}
+                            </p>
+                          </div>
+                          {/* Add / Remove */}
+                          {isAdded ? (
+                            <button
+                              onClick={() => {
+                                setAddedExtras(prev => { const s = new Set(prev); s.delete(item.id); return s })
+                                onRemoveFromCart?.(item.id)
+                              }}
+                              className="h-9 px-4 border border-(--color-border-secondary) rounded-xl text-[14px] font-semibold text-(--color-fg-tertiary) shrink-0 active:bg-(--color-bg-secondary) transition-colors"
+                            >
+                              Remove
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setAddedExtras(prev => new Set([...prev, item.id]))
+                                onAddToCart?.(item)
+                              }}
+                              className="h-9 px-4 bg-(--color-fg-primary) rounded-xl text-[14px] font-semibold text-white shrink-0 active:opacity-90 transition-opacity"
+                            >
+                              Add
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
 
       </div>
       </OciStepLayout>
