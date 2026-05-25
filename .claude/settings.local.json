@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "*",
+      "Bash(curl -s \"https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=0:22355&depth=10\" -H \"X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s \"https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=0:22355&depth=15\" -H \"X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI\")",
+      "Bash(curl -s \"https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N?depth=2\" -H \"X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI\")",
+      "Bash(curl -s \"https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=0:22346&depth=3\" -H \"X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI\")",
+      "Bash(curl -s \"https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=0:22357&depth=8\" -H \"X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI\")",
+      "Bash(curl -s \"https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=I0:22358;268:27423;268:26185,I0:22358;268:27423;268:26188,I0:22358;268:27423;268:26195&depth=5\" -H \"X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI\")",
+      "Bash(curl -s \"https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=I0:22358;241:14447&depth=3\" -H \"X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('PEERS:', json.dumps\\(p.get\\('peerDependencies',{}\\), indent=2\\)\\); print\\('DEPS:', json.dumps\\(p.get\\('dependencies',{}\\), indent=2\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); devDeps=p.get\\('devDependencies',{}\\); allDeps={**p.get\\('dependencies',{}\\), **devDeps}; motion=[k for k in allDeps if 'motion' in k or 'framer' in k]; print\\(motion\\); [print\\(k, allDeps[k]\\) for k in motion]\")",
+      "Bash(node -e \"const icons = require\\('@untitledui/icons'\\); console.log\\(Object.keys\\(icons\\).slice\\(0,20\\).join\\(', '\\)\\)\")",
+      "Bash(grep -E \"\\\\.\\(d\\\\.mts\\)$\")",
+      "Bash(grep \"\\\\.js$\")",
+      "Bash(npm install *)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('name:', p.get\\('name'\\)\\); print\\('deps:', list\\(p.get\\('dependencies',{}\\).keys\\(\\)\\)[:10]\\)\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('name:', p.get\\('name'\\)\\); print\\('deps:', list\\(p.get\\('dependencies',{}\\).keys\\(\\)\\)[:15]\\)\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\(json.dumps\\(p.get\\('dependencies',{}\\), indent=2\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\(json.dumps\\(p.get\\('devDependencies',{}\\), indent=2\\)\\)\")",
+      "Bash(python3 -c \"import json,sys; p=json.load\\(sys.stdin\\); print\\('name:', p.get\\('name'\\)\\); deps=list\\(p.get\\('dependencies',{}\\).keys\\(\\)\\); print\\('deps:', deps[:8]\\)\")",
+      "Bash(npm info *)",
+      "Bash(cp -r '/Users/anfisa/Desktop/Claude Playground/Guest portal settings/AI WORK 2026/Channel-manager-Alex--Reservations-list-exploration/src/components' '/Users/anfisa/Desktop/Claude Playground/Guest portal settings/AI WORK 2026/Guest-hub/src/')",
+      "Bash(cp -r '/Users/anfisa/Desktop/Claude Playground/Guest portal settings/AI WORK 2026/Channel-manager-Alex--Reservations-list-exploration/src/pages' '/Users/anfisa/Desktop/Claude Playground/Guest portal settings/AI WORK 2026/Guest-hub/src/')",
+      "Bash(cp -r '/Users/anfisa/Desktop/Claude Playground/Guest portal settings/AI WORK 2026/Channel-manager-Alex--Reservations-list-exploration/src/context' '/Users/anfisa/Desktop/Claude Playground/Guest portal settings/AI WORK 2026/Guest-hub/src/')",
+      "Bash(cp -r '/Users/anfisa/Desktop/Claude Playground/Guest portal settings/AI WORK 2026/Channel-manager-Alex--Reservations-list-exploration/src/hooks' '/Users/anfisa/Desktop/Claude Playground/Guest portal settings/AI WORK 2026/Guest-hub/src/')",
+      "Bash(cp -r __TRACKED_VAR__/src/lib __TRACKED_VAR__/src/)",
+      "Bash(grep -E \"^\\(ClockFastForward|BellMinus|ArrowBlockUp|MinusCircle|HeartHand|Tag02|ZapFast|Car01|Gift01|MarkerPin01|RefreshCcw01|Star01|Tag01|Wifi\\)$\")",
+      "Bash(npx tsc *)",
+      "Bash(curl -s 'https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=41%3A10518&depth=4' -H 'X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI')",
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s 'https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=41%3A10518&depth=6' -H 'X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI')",
+      "Bash(curl -s 'https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=41%3A10518&depth=3' -H 'X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI')",
+      "Bash(curl -s 'https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=41%3A10629%2C41%3A10641&depth=5' -H 'X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI')",
+      "Bash(curl -s 'https://api.figma.com/v1/files/ZffaZR1wuPYefAGZfObs9N/nodes?ids=41%3A10641&depth=6' -H 'X-Figma-Token: figd_C6jpgMTrDHoUaH1UrCd_Rn2JruKig6AuuozuCUDI')"
+    ]
+  }
+}

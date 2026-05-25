@@ -1,0 +1,16 @@
+export const SCREENS = {
+  PRE_LOGIN: 'pre-login',
+  HOMEPAGE: 'homepage',
+  STEP1: 'step1',
+  STEP2: 'step2',
+  STEP3: 'step3',
+  STEP4: 'step4',
+  STEP5: 'step5',
+  STEP6: 'step6',
+  ARRIVAL_GUIDE: 'arrival-guide',
+  ACCESS_REVEAL: 'access-reveal',
+  GUIDE: 'guide',
+  EXPLORE: 'explore',
+  UPSELLS: 'upsells',
+  UPSELL_CHECKOUT: 'upsell-checkout',
+}

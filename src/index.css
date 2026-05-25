@@ -1,0 +1,46 @@
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "@hostaway/design-system/dist/theme.css";
+@import "@hostaway/design-system/dist/animations.css";
+@source "../**/*.{js,jsx,ts,tsx}";
+@source "../node_modules/@hostaway/design-system/dist/**/*.js";
+
+/* B2C custom tokens — not in Hostaway B2B DS, pending B2C DS */
+:root {
+  --color-bg-warm: rgb(242, 241, 237); /* #f2f1ed */
+}
+
+* {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+html, body {
+  background: var(--color-bg-warm);
+  min-height: 100vh;
+}
+
+.phone-shell {
+  width: 100%;
+  max-width: 900px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: var(--color-bg-warm);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.scrollable {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scrollable::-webkit-scrollbar { display: none; }
+
+input, select, textarea {
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
