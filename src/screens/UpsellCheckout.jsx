@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SCREENS } from '../screens'
 
 // Upsell cart review + pay page.
@@ -21,28 +21,83 @@ const PAYMENT_METHODS = [
   { id: 'card',        label: 'Credit / Debit card', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/><path d="M2 9h20" stroke="currentColor" strokeWidth="1.6"/><path d="M6 15h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg> },
 ]
 
+// ── Confetti ──────────────────────────────────────────────────────────────────
+const CONFETTI_COLORS = ['#FF6B6B','#4ECDC4','#45B7D1','#96E6A1','#FFEAA7','#DDA0DD','#FFB347','#87CEEB']
+const CONFETTI_PIECES = Array.from({ length: 40 }, (_, i) => ({
+  id: i, color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+  left: ((i * 37 + 13) % 100) + '%',
+  delay: ((i * 0.07) % 0.9).toFixed(2) + 's',
+  duration: (1.4 + (i * 0.05) % 1.2).toFixed(2) + 's',
+  width: (6 + (i % 4) * 2) + 'px', height: (8 + (i % 3) * 3) + 'px',
+  rotate: (i * 47) % 360,
+}))
+function ConfettiOverlay() {
+  return (
+    <div className="absolute inset-0 z-[200] pointer-events-none overflow-hidden">
+      <style>{`@keyframes co-fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}75%{opacity:1}100%{transform:translateY(920px) rotate(720deg);opacity:0}}`}</style>
+      {CONFETTI_PIECES.map(p => (
+        <div key={p.id} style={{ position:'absolute', top:0, left:p.left, width:p.width, height:p.height, backgroundColor:p.color, borderRadius:'2px', animation:`co-fall ${p.duration} ${p.delay} ease-in forwards`, transform:`rotate(${p.rotate}deg)` }} />
+      ))}
+    </div>
+  )
+}
+
 export default function UpsellCheckout({ context = 'upsell', cartItems = [], onRemoveFromCart, navigate, onExit, onConfirm }) {
   const [selectedMethod, setSelectedMethod] = useState('card')
   const [cardNumber, setCardNumber] = useState('')
   const [cardName, setCardName]     = useState('')
   const [expiry, setExpiry]         = useState('')
   const [cvc, setCvc]               = useState('')
+  const [paid, setPaid]             = useState(false)
 
   const total = cartItems.reduce((sum, item) => sum + parsePrice(item.price), 0)
   const currency = getCurrency(cartItems)
   const isRequestFlow = cartItems.some(i => i.requiresRequest)
+  const itemLabel = cartItems[0]?.label ?? 'your extra'
 
   const formatCard   = v => v.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim()
   const formatExpiry = v => { const d=v.replace(/\D/g,'').slice(0,4); return d.length>=3?`${d.slice(0,2)}/${d.slice(2)}`:d }
 
   const handleConfirm = () => {
-    if (onConfirm) {
-      onConfirm()
-    } else if (context === 'checkin') {
-      navigate(SCREENS.STEP6)
-    } else {
-      navigate(SCREENS.HOMEPAGE)
+    if (!isRequestFlow && cartItems.length > 0) {
+      // Show success screen
+      setPaid(true)
+      return
     }
+    if (onConfirm) onConfirm()
+    else if (context === 'checkin') navigate(SCREENS.STEP6)
+    else navigate(SCREENS.HOMEPAGE)
+  }
+
+  const handleDone = () => {
+    if (onConfirm) onConfirm()
+    else if (context === 'checkin') navigate(SCREENS.STEP6)
+    else navigate(SCREENS.UPSELLS)
+  }
+
+  // ── Success screen ────────────────────────────────────────────────────────
+  if (paid) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-(--color-bg-warm) relative px-6">
+        <ConfettiOverlay />
+        <div className="w-20 h-20 rounded-full bg-(--color-hostaway-secondary-600) flex items-center justify-center mb-6 shadow-lg">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <path d="M7 18l7 7 15-15" stroke="white" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <h1 className="text-[28px] font-bold text-(--color-fg-primary) text-center mb-2 leading-tight">You're all set! 🎉</h1>
+        <p className="text-[16px] text-(--color-fg-tertiary) text-center leading-relaxed mb-2">
+          <span className="font-semibold text-(--color-fg-primary)">{itemLabel}</span> has been added to your reservation.
+        </p>
+        <p className="text-[14px] text-(--color-fg-quaternary) text-center mb-10">Payment confirmed. Enjoy!</p>
+        <button
+          onClick={handleDone}
+          className="w-full max-w-[320px] h-12 bg-(--color-fg-primary) rounded-xl text-[16px] font-semibold text-white active:opacity-90 transition-opacity"
+        >
+          Back to extras
+        </button>
+      </div>
+    )
   }
 
   return (
@@ -216,9 +271,6 @@ export default function UpsellCheckout({ context = 'upsell', cartItems = [], onR
                 <span className="text-[14px] font-bold text-(--color-fg-primary)">{isRequestFlow ? 'TBD' : `${currency}${total.toFixed(2)}`}</span>
               </div>
             </div>
-            {!isRequestFlow && (
-              <p className="text-[11px] text-(--color-fg-tertiary) mt-3">This will be charged before you check out.</p>
-            )}
           </div>
         )}
       </div>
