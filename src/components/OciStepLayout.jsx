@@ -63,7 +63,7 @@ export default function OciStepLayout({
 
       {/* ── Nav row ── z-10 */}
       <div className="absolute top-[0px] left-0 right-0 z-10 px-4 pt-4">
-        <div className="flex items-center justify-between h-12">
+        <div className="flex items-center justify-between">
           {hideBack ? (
             <div className="w-10 h-10" />
           ) : (

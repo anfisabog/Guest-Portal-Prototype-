@@ -57,7 +57,7 @@ export default function BottomTabBarV2({ activeTab, onTabChange, navigate, cartC
                 >
                   {/* Full-height active pill */}
                   {active && (
-                    <div className="absolute inset-x-1 inset-y-2 bg-(--color-bg-secondary) rounded-full" />
+                    <div className="absolute inset-1 bg-(--color-bg-secondary) rounded-full" />
                   )}
                   {/* Icon + label above pill */}
                   <div className="relative z-10 flex flex-col items-center gap-0.5">
