@@ -1,15 +1,16 @@
 import { useState, useRef } from 'react'
-import UpsellDrawer from '../components/UpsellDrawer'
 import { SCREENS } from '../screens'
 import MenuButton from '../components/MenuButton'
 import { upsellItems } from '../data/upsells'
+import { formatPrice } from '../utils/formatPrice'
 import CheckInCTAButton from '../components/CheckInCTAButton'
 import ListRow from '../components/ListRow'
+import HowToGetInModal from '../components/HowToGetInModal'
 import { Badge, FeaturedIcon, EmptyState } from '@hostaway/design-system'
 import {
   LogIn01, LogOut01, Users01, Moon01, Link01, LinkExternal01,
   Clock, Mail01, Download01, CheckCircle,
-  Wifi, Phone01, Map01, FileAttachment01, SlashCircle01, Copy01, SearchMd,
+  Wifi, Phone01, Map01, FileAttachment01, SlashCircle01, Copy01, SearchMd, Tag01, ChevronRight,
 } from '@hostaway/design-system/icons'
 
 
@@ -107,8 +108,8 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
   const [showMapDrawer, setShowMapDrawer] = useState(false)
   const [mapDragY, setMapDragY] = useState(0)
   const [mapSnapping, setMapSnapping] = useState(false)
-  const [upsellDrawerItem, setUpsellDrawerItem] = useState(null)
   const [addedUpsells, setAddedUpsells] = useState(new Set())
+  const [showHowToModal, setShowHowToModal] = useState(false)
   const mapDragStart = useRef(null)
 
   const handleMapDragStart = (clientY) => { setMapSnapping(false); mapDragStart.current = clientY }
@@ -213,7 +214,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
                 <button onClick={handlePropertyTap} className="text-left">
                   <p className="text-[16px] font-bold text-(--color-fg-primary) leading-6 mt-0.5">Brisa Deluxe Studio</p>
                 </button>
-                <div className="flex items-center gap-x-1 gap-y-[2px] mt-1.5 flex-wrap">
+                <div className="flex items-center gap-1 mt-1.5 flex-wrap">
                   <Badge type="pill-color" size="sm" color="gray">2 guests</Badge>
                   <span className="w-[3px] h-[3px] rounded-full bg-(--color-border-primary) shrink-0" />
                   <Badge type="pill-color" size="sm" color="gray">Starts in 3 weeks</Badge>
@@ -267,7 +268,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
                 />
               ) : (
                 <button
-                  onClick={() => navigate(SCREENS.ACCESS_REVEAL)}
+                  onClick={() => setShowHowToModal(true)}
                   className="w-full h-11 border border-(--color-border-primary) rounded-xl text-[16px] font-semibold text-(--color-fg-primary) hover:bg-(--color-bg-secondary) active:bg-(--color-bg-secondary) transition-colors flex items-center justify-center gap-2"
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -293,7 +294,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
                 return (
                   <div
                     key={id}
-                    onClick={clickable ? () => setUpsellDrawerItem(item) : undefined}
+                    onClick={clickable ? () => onBuyNow?.(item) : undefined}
                     className={`bg-white rounded-2xl flex-shrink-0 w-[220px] flex flex-col overflow-hidden ${clickable ? 'cursor-pointer active:opacity-80' : ''}`}
                   >
                     {/* Image */}
@@ -314,7 +315,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
                             <span className="text-[14px] font-bold text-(--color-hostaway-secondary-600)">FREE</span>
                           ) : (
                             <>
-                              <span className="text-[14px] font-bold text-(--color-fg-primary)">{price}</span>
+                              <span className="text-[14px] font-bold text-(--color-fg-primary)">{formatPrice(price)}</span>
                               {unit && <span className="text-[11px] text-(--color-fg-tertiary) ml-0.5">{unit}</span>}
                             </>
                           )}
@@ -365,7 +366,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
 
             {/* Amenities */}
             <Accordion label="Amenities">
-              <AmenitiesContent />
+              <AmenitiesContent onBuyNow={onBuyNow} />
             </Accordion>
 
             {/* House rules */}
@@ -465,21 +466,7 @@ export default function Homepage({ navigate, checkInComplete, demoMode, onOpenDe
           </div>
       </div>
 
-      {/* Upsell drawer */}
-      {upsellDrawerItem && (
-        <UpsellDrawer
-          item={upsellDrawerItem}
-          onClose={() => setUpsellDrawerItem(null)}
-          onBuy={(item) => {
-            setUpsellDrawerItem(null)
-            if (item.price === 'FREE') {
-              setAddedUpsells(prev => new Set([...prev, item.id]))
-            } else {
-              onBuyNow?.(item)
-            }
-          }}
-        />
-      )}
+      {showHowToModal && <HowToGetInModal onClose={() => setShowHowToModal(false)} />}
     </div>
   )
 }
@@ -549,7 +536,7 @@ const AMENITY_CATEGORIES = [
 ]
 
 // ── Amenities content (shared between pre & post check-in) ────────────────
-function AmenitiesContent() {
+function AmenitiesContent({ onBuyNow }) {
   const [query, setQuery] = useState('')
   const q = query.toLowerCase().trim()
 
@@ -598,24 +585,19 @@ function AmenitiesContent() {
                 <p className="text-[14px] font-semibold text-(--color-fg-primary)">Not a standard amenity</p>
                 <p className="text-[13px] text-(--color-fg-tertiary) leading-5">Not included, but you can add it to your stay.</p>
               </div>
-              <div className="border border-(--color-border-secondary) rounded-xl p-3 flex items-center gap-3">
-                <div className="w-10 h-10 bg-(--color-bg-warm) rounded-lg shrink-0 flex items-center justify-center">
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                    <rect x="1" y="3" width="16" height="12" rx="2" stroke="var(--color-fg-tertiary)" strokeWidth="1.3"/>
-                    <circle cx="6" cy="8" r="1.5" fill="var(--color-fg-tertiary)"/>
-                    <path d="M1 12l4-3 3 2.5 3-3 5 3.5" stroke="var(--color-fg-tertiary)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
+              <button
+                onClick={() => onBuyNow?.(upsellMatch)}
+                className="w-full flex items-center gap-3 py-3 border-b border-(--color-border-secondary) active:opacity-70 transition-opacity text-left"
+              >
+                <FeaturedIcon icon={Tag01} size="sm" color="gray" theme="modern" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-(--color-fg-primary)">{upsellMatch.label}</p>
-                  <p className="text-[13px] text-(--color-hostaway-secondary-600) font-medium">
-                    {upsellMatch.price === 'FREE' ? 'FREE' : `${upsellMatch.price}${upsellMatch.unit}`}
+                  <p className="text-[15px] text-(--color-fg-primary)">{upsellMatch.label}</p>
+                  <p className="text-[13px] text-(--color-hostaway-secondary-600) font-medium mt-0.5">
+                    {upsellMatch.price === 'FREE' ? 'FREE' : `${formatPrice(upsellMatch.price)}${upsellMatch.unit}`}
                   </p>
                 </div>
-                <button className="h-9 px-4 bg-(--color-fg-primary) rounded-xl text-[13px] font-semibold text-white shrink-0">
-                  Add
-                </button>
-              </div>
+                <ChevronRight width={16} height={16} className="text-(--color-fg-quaternary) shrink-0" />
+              </button>
             </div>
           ) : (
             /* ── Generic no-match empty state ── */

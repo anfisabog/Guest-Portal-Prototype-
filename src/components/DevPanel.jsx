@@ -15,7 +15,7 @@ function Toggle({ label, desc, value, onChange }) {
   )
 }
 
-export default function DevPanel({ demoMode, setDemoMode, guidebooksEnabled, setGuidebooksEnabled, tabBarVariant, setTabBarVariant, onClose }) {
+export default function DevPanel({ demoMode, setDemoMode, guidebooksEnabled, setGuidebooksEnabled, tabBarVariant, setTabBarVariant, checkInComplete, setCheckInComplete, onClose }) {
   return (
     <div className="absolute inset-0 z-50 flex flex-col justify-end">
       {/* Backdrop */}
@@ -43,6 +43,12 @@ export default function DevPanel({ demoMode, setDemoMode, guidebooksEnabled, set
 
         <div className="h-px bg-(--color-border-secondary) my-4"/>
 
+        <Toggle
+          label="Check-in complete"
+          desc="ON = post check-in state · OFF = pre check-in (locked access)"
+          value={checkInComplete}
+          onChange={setCheckInComplete}
+        />
         <Toggle
           label="Demo mode (populated)"
           desc="ON = full content · OFF = empty/minimal PM setup"

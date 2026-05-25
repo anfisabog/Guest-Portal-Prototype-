@@ -17,6 +17,7 @@ import BottomTabBar from './components/BottomTabBar'
 import BottomTabBarV2 from './components/BottomTabBarV2'
 import CartFooter, { CART_FOOTER_HEIGHT } from './components/CartFooter'
 import DevPanel from './components/DevPanel'
+import ToastBanner from './components/ToastBanner'
 
 const FLOW_SCREENS = new Set([
   SCREENS.STEP1, SCREENS.STEP2, SCREENS.STEP3,
@@ -37,13 +38,18 @@ export default function App() {
   const [checkInStarted, setCheckInStarted] = useState(false)
   const [checkInResumeStep, setCheckInResumeStep] = useState(null)
   const [upsellCheckoutContext, setUpsellCheckoutContext] = useState('upsell') // 'checkin' | 'upsell'
-  const [cartItems, setCartItems] = useState([])
+  // Separate carts: check-in extras (Step1 → Step5) vs upsell tab purchases
+  const [checkInCartItems, setCheckInCartItems] = useState([])
+  const [upsellCartItems, setUpsellCartItems] = useState([])
+  const [freeAddedItems, setFreeAddedItems] = useState(new Set())
+  const [toast, setToast] = useState({ message: '', visible: false })
 
+  // Check-in cart — items added during the check-in flow only
   const addToCart = (item) => {
-    setCartItems(prev => prev.find(i => i.id === item.id) ? prev : [...prev, item])
+    setCheckInCartItems(prev => prev.find(i => i.id === item.id) ? prev : [...prev, item])
   }
   const removeFromCart = (id) => {
-    setCartItems(prev => prev.filter(i => i.id !== id))
+    setCheckInCartItems(prev => prev.filter(i => i.id !== id))
   }
 
   const navigate = (to) => {
@@ -55,11 +61,16 @@ export default function App() {
   }
 
   const handleBuyNow = (item) => {
-    // FREE items auto-confirmed in drawer — drawer calls onBuy to close, no checkout needed
-    if (item.price === 'FREE') return
-    setCartItems([{ ...item }])
+    setUpsellCartItems([{ ...item }])
     setUpsellCheckoutContext('upsell')
     navigate(SCREENS.UPSELL_CHECKOUT)
+  }
+
+  const handleFreeItemConfirmed = (id) => {
+    setFreeAddedItems(prev => new Set([...prev, id]))
+  }
+  const handleRemoveFreeItem = (id) => {
+    setFreeAddedItems(prev => { const s = new Set(prev); s.delete(id); return s })
   }
 
   // Only show confirmation drawer if user actually changed something
@@ -90,8 +101,8 @@ export default function App() {
 
   const showTabBar = !FLOW_SCREENS.has(screen)
 
-  // Progress: 4 steps (25% each) base; 5 steps (20%) when upsell cart has items
-  const hasUpsells = cartItems.length > 0
+  // Progress: 4 steps (25% each) base; 5 steps (20%) when check-in cart has extras
+  const hasUpsells = checkInCartItems.length > 0
   const stepProgress = hasUpsells
     ? { step1: 20, step2: 40, step4: 60, step5: 80 }
     : { step1: 25, step2: 50, step4: 75, step5: 100 }
@@ -113,7 +124,7 @@ export default function App() {
       case SCREENS.STEP5:
         return <Step5Payment navigate={navigate} onExit={handleExitCheckin} progress={stepProgress.step5}
           onContinue={() => navigate(SCREENS.STEP6)}
-          cartItems={cartItems}
+          cartItems={checkInCartItems}
           onRemoveFromCart={removeFromCart}
         />
       case SCREENS.STEP6:
@@ -123,16 +134,39 @@ export default function App() {
       case SCREENS.ACCESS_REVEAL:
         return <AccessReveal navigate={navigate} checkInComplete={checkInComplete} demoMode={demoMode} checkInStarted={checkInStarted} checkInResumeStep={checkInResumeStep} onBuyNow={handleBuyNow} />
       case SCREENS.UPSELLS:
-        return <UpsellsTab tabBarVariant={tabBarVariant} navigate={navigate} onBuyNow={handleBuyNow} />
-      case SCREENS.UPSELL_CHECKOUT:
+        return <UpsellsTab
+          tabBarVariant={tabBarVariant}
+          navigate={navigate}
+          onBuyNow={handleBuyNow}
+          addedItems={freeAddedItems}
+          onRemoveFreeItem={handleRemoveFreeItem}
+        />
+      case SCREENS.UPSELL_CHECKOUT: {
+        const activeCart = upsellCheckoutContext === 'checkin' ? checkInCartItems : upsellCartItems
+        const activeRemove = upsellCheckoutContext === 'checkin' ? removeFromCart : (id) => setUpsellCartItems(prev => prev.filter(i => i.id !== id))
         return <UpsellCheckout
           context={upsellCheckoutContext}
-          cartItems={cartItems}
-          onRemoveFromCart={removeFromCart}
+          cartItems={activeCart}
+          onRemoveFromCart={activeRemove}
           navigate={navigate}
           onExit={handleExitCheckin}
-          onConfirm={() => navigate(upsellCheckoutContext === 'checkin' ? SCREENS.STEP6 : SCREENS.UPSELLS)}
+          onConfirm={() => {
+            const first = activeCart[0]
+            const isFree = first?.price === 'FREE'
+            const isReq  = first?.requiresRequest
+            if (isFree) handleFreeItemConfirmed(first.id)
+            if (upsellCheckoutContext === 'upsell') setUpsellCartItems([])
+            // Toast for FREE and request items (paid items show their own full success screen)
+            if (first && (isFree || isReq)) {
+              const msg = isReq
+                ? `${first.label} requested — we'll be in touch`
+                : `${first.label} added to your reservation`
+              setToast({ message: msg, visible: true })
+            }
+            navigate(upsellCheckoutContext === 'checkin' ? SCREENS.STEP6 : SCREENS.UPSELLS)
+          }}
         />
+      }
       default:
         return <PreLogin navigate={navigate} />
     }
@@ -141,6 +175,11 @@ export default function App() {
   const screenContent = (
     <>
       {renderScreen()}
+      <ToastBanner
+        message={toast.message}
+        visible={toast.visible}
+        onHide={() => setToast(t => ({ ...t, visible: false }))}
+      />
       {showTabBar && (tabBarVariant === 'v2'
         ? <BottomTabBarV2 activeTab={activeTab} onTabChange={setActiveTab} navigate={navigate} />
         : <BottomTabBar   activeTab={activeTab} onTabChange={setActiveTab} navigate={navigate} />
@@ -156,6 +195,8 @@ export default function App() {
           setGuidebooksEnabled={() => {}}
           tabBarVariant={tabBarVariant}
           setTabBarVariant={setTabBarVariant}
+          checkInComplete={checkInComplete}
+          setCheckInComplete={setCheckInComplete}
           onClose={() => setShowDevPanel(false)}
         />
       )}

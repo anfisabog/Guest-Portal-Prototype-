@@ -45,7 +45,7 @@ export default function BottomTabBarV2({ activeTab, onTabChange, navigate, cartC
 
       {/* Tab bar pill container — bg-warm fills the side margins so content can't bleed through */}
       <div className="absolute bottom-0 left-0 right-0 px-4 pb-3 pointer-events-auto bg-(--color-bg-warm)">
-        <div className="bg-white rounded-[28px] border border-(--color-border-secondary) shadow-sm overflow-hidden" style={{ height: 72 }}>
+        <div className="bg-white rounded-full border border-(--color-border-secondary) shadow-sm overflow-hidden" style={{ height: 72 }}>
           <div className="flex h-full">
             {tabs.map(({ key, label, icon, onPress }) => {
               const active = activeTab === key
@@ -57,7 +57,7 @@ export default function BottomTabBarV2({ activeTab, onTabChange, navigate, cartC
                 >
                   {/* Full-height active pill */}
                   {active && (
-                    <div className="absolute inset-x-1 inset-y-2 bg-(--color-bg-secondary) rounded-[20px]" />
+                    <div className="absolute inset-x-1 inset-y-2 bg-(--color-bg-secondary) rounded-full" />
                   )}
                   {/* Icon + label above pill */}
                   <div className="relative z-10 flex flex-col items-center gap-0.5">

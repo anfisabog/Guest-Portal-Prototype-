@@ -1,29 +1,16 @@
-import { useState } from 'react'
 import { upsellItems } from '../data/upsells'
-import UpsellDrawer from '../components/UpsellDrawer'
+import { formatPrice } from '../utils/formatPrice'
 
-export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
-  const [drawerItem, setDrawerItem] = useState(null)
-  const [addedItems, setAddedItems] = useState(new Set())
+export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow, addedItems = new Set(), onRemoveFreeItem }) {
   const pb = tabBarVariant === 'v2' ? 104 : 68
-
-  const handleDrawerBuy = (item) => {
-    setDrawerItem(null)
-    if (item.price === 'FREE') {
-      setAddedItems(prev => new Set([...prev, item.id]))
-    } else {
-      onBuyNow?.(item)
-    }
-  }
 
   const handleRemove = (e, id) => {
     e.stopPropagation()
-    setAddedItems(prev => { const s = new Set(prev); s.delete(id); return s })
+    onRemoveFreeItem?.(id)
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-(--color-bg-warm)">
-
+    <div className="min-h-screen flex flex-col" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}home%20page%20background.png)`, backgroundSize: 'cover', backgroundPosition: 'center top', backgroundRepeat: 'no-repeat' }}>
       <div className="flex-1 overflow-y-auto scrollable" style={{ paddingBottom: pb }}>
         {/* Header */}
         <div className="px-4 pt-5 pb-3">
@@ -41,7 +28,7 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
             return (
               <div
                 key={id}
-                onClick={clickable ? () => setDrawerItem(item) : undefined}
+                onClick={clickable ? () => onBuyNow?.(item) : undefined}
                 className={`bg-white rounded-2xl overflow-hidden flex ${clickable ? 'cursor-pointer active:opacity-80' : ''}`}
               >
                 {/* Image */}
@@ -60,7 +47,6 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
 
                 {/* Content */}
                 <div className="flex-1 p-3 flex flex-col min-w-0">
-                  {/* Title */}
                   <p className="text-[18px] font-bold text-(--color-fg-primary) leading-snug">{label}</p>
                   <p className="text-[15px] text-(--color-fg-tertiary) leading-snug mt-1 line-clamp-2 flex-1">{description}</p>
 
@@ -72,7 +58,7 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
                         <span className="text-[15px] font-bold text-(--color-hostaway-secondary-600)">FREE</span>
                       ) : (
                         <>
-                          <span className="text-[15px] font-bold text-(--color-fg-primary)">{price}</span>
+                          <span className="text-[15px] font-bold text-(--color-fg-primary)">{formatPrice(price)}</span>
                           {unit && <span className="text-[12px] text-(--color-fg-tertiary) ml-0.5">{unit}</span>}
                         </>
                       )}
@@ -80,12 +66,10 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
 
                     {/* Action */}
                     {addedByOTA ? (
-                      /* Included — disabled pill */
                       <span className="text-[12px] font-semibold px-3 py-1 rounded-full bg-(--color-bg-secondary) text-(--color-fg-quaternary) border border-(--color-border-secondary)">
                         Included
                       </span>
                     ) : isAdded ? (
-                      /* Trash icon — remove */
                       <button
                         onClick={(e) => handleRemove(e, id)}
                         className="w-9 h-9 rounded-xl border border-(--color-border-primary) flex items-center justify-center text-(--color-fg-secondary) hover:border-(--color-fg-error-primary) hover:text-(--color-fg-error-primary) hover:bg-red-50 active:opacity-70 transition-colors shrink-0"
@@ -97,7 +81,6 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
                         </svg>
                       </button>
                     ) : (
-                      /* Arrow chevron */
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
                         <path d="M6 4l4 4-4 4" stroke="var(--color-fg-quaternary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
@@ -109,15 +92,6 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
           })}
         </div>
       </div>
-
-      {/* Drawer */}
-      {drawerItem && (
-        <UpsellDrawer
-          item={drawerItem}
-          onClose={() => setDrawerItem(null)}
-          onBuy={handleDrawerBuy}
-        />
-      )}
     </div>
   )
 }

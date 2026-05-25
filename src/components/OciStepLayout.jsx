@@ -114,7 +114,7 @@ export default function OciStepLayout({
           </div>
         ) : (
           /* sticky top-[8px] = SafariBar(94) + 8px. Card sized to content, no forced min-h. */
-          <div className="sticky top-[8px] bg-white rounded-t-3xl pb-[88px] pointer-events-auto">
+          <div className="sticky top-[8px] bg-white rounded-t-3xl pb-[88px] pointer-events-auto min-h-[calc(100vh-8px)]">
             {children}
           </div>
         )}

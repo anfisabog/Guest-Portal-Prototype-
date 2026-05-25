@@ -143,15 +143,13 @@ export default function Step5Payment({ navigate, onExit, onContinue, progress = 
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
           <div className="w-20 h-20 rounded-3xl bg-(--color-bg-secondary) flex items-center justify-center mb-6">
             <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-              <path d="M20 6c-1.1 0-2 .9-2 2v1.2A11 11 0 0 0 9 20c0 6.08 4.92 11 11 11s11-4.92 11-11a11 11 0 0 0-9-10.8V8c0-1.1-.9-2-2-2z" fill="var(--color-border-secondary)"/>
-              <path d="M20 8v8l4 4" stroke="var(--color-hostaway-secondary-600)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
               <circle cx="20" cy="20" r="11" stroke="var(--color-hostaway-secondary-600)" strokeWidth="2" fill="none"/>
               <path d="M14 20l4 4 8-8" stroke="var(--color-hostaway-secondary-600)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <p className="text-[22px] font-bold text-(--color-fg-primary) mb-3">Ready to check in? Let's go! 🚀</p>
+          <p className="text-[22px] font-bold text-(--color-fg-primary) mb-3">Nothing to pay</p>
           <p className="text-[16px] text-(--color-fg-tertiary) leading-relaxed max-w-[260px]">
-            No extras added, nothing to pay. Tap <span className="font-semibold text-(--color-fg-primary)">Complete</span> and your stay begins!
+            No extras were added to your stay. Tap Complete to finish your check-in.
           </p>
         </div>
       ) : (
