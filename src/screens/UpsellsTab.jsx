@@ -88,12 +88,12 @@ export default function UpsellsTab({ tabBarVariant = 'v2', onBuyNow }) {
                       /* Trash icon — remove */
                       <button
                         onClick={(e) => handleRemove(e, id)}
-                        className="w-8 h-8 rounded-xl border border-(--color-border-secondary) flex items-center justify-center text-(--color-fg-quaternary) hover:border-(--color-fg-error-primary) hover:text-(--color-fg-error-primary) active:opacity-70 transition-colors shrink-0"
+                        className="w-9 h-9 rounded-xl border border-(--color-border-primary) flex items-center justify-center text-(--color-fg-secondary) hover:border-(--color-fg-error-primary) hover:text-(--color-fg-error-primary) hover:bg-red-50 active:opacity-70 transition-colors shrink-0"
                         aria-label="Remove"
                       >
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                          <path d="M2 4h10M5 4V2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V4M6 7v3M8 7v3M3 4l.75 7.25A.75.75 0 0 0 4.5 12h5a.75.75 0 0 0 .75-.75L11 4"
-                            stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/>
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                          <path d="M3 5.5h12M7 5.5V3.75A.75.75 0 0 1 7.75 3h2.5a.75.75 0 0 1 .75.75V5.5M7.5 9v4M10.5 9v4M4 5.5l1 9.25A.75.75 0 0 0 5.75 15h6.5a.75.75 0 0 0 .75-.75L14 5.5"
+                            stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </button>
                     ) : (

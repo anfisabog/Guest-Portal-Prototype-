@@ -287,9 +287,9 @@ export default function UpsellCheckout({ context = 'upsell', cartItems = [], onR
             : isRequestFlow
               ? 'Send a request'
               : selectedMethod === 'apple-pay'
-                ? `Pay with Apple Pay — ${currency}${total.toFixed(2)}`
+                ? `Pay with Apple Pay for ${currency}${total.toFixed(2)}`
                 : selectedMethod === 'google-pay'
-                  ? `Pay with Google Pay — ${currency}${total.toFixed(2)}`
+                  ? `Pay with Google Pay for ${currency}${total.toFixed(2)}`
                   : `Pay ${currency}${total.toFixed(2)}`}
         </button>
         {isRequestFlow && cartItems.length > 0 && (

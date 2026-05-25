@@ -23,7 +23,7 @@ export default function UpsellDrawer({ item, onClose, onBuy }) {
   // FREE: auto-confirm and close after 1.8s
   useEffect(() => {
     if (!confirmed) return
-    const t = setTimeout(() => { onBuy(item) }, 1800)
+    const t = setTimeout(() => { onBuy(item) }, 600)
     return () => clearTimeout(t)
   }, [confirmed]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -35,8 +35,8 @@ export default function UpsellDrawer({ item, onClose, onBuy }) {
   const ctaLabel = isFree
     ? 'Add for free'
     : requiresRequest
-      ? `Request — ${formattedPrice}`
-      : `Buy now — ${formattedPrice}`
+      ? `Request for ${formattedPrice}`
+      : `Buy now for ${formattedPrice}`
 
   const handleCta = () => {
     if (isFree) setConfirmed(true)
@@ -74,12 +74,9 @@ export default function UpsellDrawer({ item, onClose, onBuy }) {
         {/* ── Scrollable body ── */}
         <div className="overflow-y-auto scrollable flex-1 pb-[104px]">
 
-          {/* Title + tagline */}
+          {/* Title */}
           <div className="px-5 pt-2 pb-4">
-            <h2 className="text-[26px] font-bold text-(--color-fg-primary) leading-tight">{label}</h2>
-            {tagline && (
-              <p className="text-[15px] text-(--color-fg-tertiary) mt-1">{tagline}</p>
-            )}
+            <h2 className="text-[18px] font-bold text-(--color-fg-primary) leading-tight">{label}</h2>
           </div>
 
           {/* Hero image — with horizontal margins and rounded corners */}
